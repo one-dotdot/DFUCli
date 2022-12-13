@@ -33,6 +33,7 @@ public:
 	int getRemain();
 	int writeDate(int step);
 	int writeRemain();
+
 	int Update2();
 
 	int enter_into_dfu(void);
