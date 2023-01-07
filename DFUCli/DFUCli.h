@@ -2,7 +2,6 @@
 #include "stdint.h"
 #include "iostream"
 #include "string"
-
 #include "hidapi.h"
 #include <msclr\marshal_cppstd.h>
 
@@ -21,6 +20,26 @@ public:
 
 	static int LoopNum = 0;
 	static int Remain = 0;
+	static char *SN;
+	static uint8_t STATE;
+	static char* HW;
+	static char* FW;
+	static uint8_t BV;
+	static uint16_t LOG;
+	static uint8_t* TIME;
+	uint8_t checksum = 0;
+	
+	uint16_t mIndex;
+	String^ openTime;
+	String^ airTime;
+	String^ inTime;
+	String^ endTime;
+	uint16_t mVolume;
+	uint8_t mState;
+	uint8_t mPower;
+	uint8_t mAir;
+	uint8_t mERR;
+	uint16_t* mERRlog;
 
 	DFUCli();
 	int Openhid();
@@ -48,6 +67,38 @@ public:
 	int verify_app(void);
 
 	int exit_from_dfu(void);
+
+	int getSn(void);
+
+	String^ getsn();
+
+	int getState(void);
+
+	int getstate();
+
+	int getHW(void);
+
+	String^ gethw();
+
+	int getFW(void);
+
+	String^ getfw();
+
+	int getBV(void);
+
+	int getbv();
+
+	int getLOG(void);
+
+	int getlog();
+
+	int getAT(void);
+
+	String^ getat();
+
+	int getInf(uint16_t index);
+
+	void dataInit();
 	
 	
 };
