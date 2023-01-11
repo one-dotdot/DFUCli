@@ -10,6 +10,11 @@
 #define ERRO_MM	-7
 #define ERRO_FR	-8
 
+#define Bit_open	0
+#define Bit_air		4
+#define Bit_star	6
+#define Bit_end		7
+
 DFUCli::DFUCli()
 {
 }
@@ -1208,12 +1213,12 @@ String^ DFUCli::getat()
 	string week;
 	year = bcd_decimal_code(TIME[6]) + 1970;
 	mon = bcd_decimal_code(TIME[5]);
-	week = getweek(TIME[4]);
+	//week = getweek(TIME[4]);
 	day = bcd_decimal_code(TIME[3]);
 	h = bcd_decimal_code(TIME[2]);
 	min = bcd_decimal_code(TIME[1]);
 	sec = bcd_decimal_code(TIME[0]);
-	sprintf(time, "%4d/%02d/%02d %s %02d:%02d:%02d", year, mon, day, week, h, min, sec);
+	sprintf(time, "%4d/%02d/%02d %02d:%02d:%02d", year, mon, day, h, min, sec);
 	String^ stdToCli = marshal_as<String^>(time);
 	return stdToCli;
 }
@@ -1230,6 +1235,12 @@ String^ TimetoString(uint8_t* TIME)
 	sec = bcd_decimal_code(TIME[0]);
 	sprintf(time, "%4d/%02d/%02d %02d:%02d:%02d", year, mon, day, h, min, sec);
 	String^ stdToCli = marshal_as<String^>(time);
+	return stdToCli;
+}
+
+String^ ChartoString(char* str)
+{
+	String^ stdToCli = marshal_as<String^>(str);
 	return stdToCli;
 }
 
@@ -1348,38 +1359,89 @@ int DFUCli::getInf(uint16_t index)
 	mIndex = RecvBuf1[3] << 8;
 	mIndex += RecvBuf1[4];
 
+	mState = RecvBuf2[56] << 8;
+	mState += RecvBuf2[57];
+	if (mState)
+	{
+		mState_bit = (uint16_t*)malloc(sizeof(uint16_t)*10);
+
+		mState_bit[0] = mState & 0x0001;	//开机
+		mState_bit[1] = mState & 0x0002;	//安装
+		mState_bit[2] = mState & 0x0004;	//标签识别
+		mState_bit[3] = mState & 0x0008;	//标签校验
+		mState_bit[4] = mState & 0x0010;	//开始排气
+		mState_bit[5] = mState & 0x0020;	//结束排气
+		mState_bit[6] = mState & 0x0040;	//开始注射
+		mState_bit[7] = mState & 0x0080;	//结束注射
+		mState_bit[8] = mState & 0x0100;	//药液吸收
+		mState_bit[9] = mState & 0x0200;	//电机归位
+	}
+
 	//时间处理
 	uint8_t opentime[8], airtime[8], intime[8], endtime[8];
-	for (int i = 0; i < 7; i++)
+	
+	if (mState_bit[Bit_open])
 	{
-		opentime[i] = RecvBuf2[i + 24] & 0x7F;
-		airtime[i] = RecvBuf2[i + 31] & 0x7F;
-		intime[i] = RecvBuf2[i + 38] & 0x7F;
-		endtime[i] = RecvBuf2[i + 45] & 0x7F;
+		for (int i = 0; i < 7; i++)
+		{
+			opentime[i] = RecvBuf2[i + 24] & 0x7f;
+		}
+		openTime = TimetoString(opentime);
+	}	
+	else
+		openTime = ChartoString("无");
+
+	if (mState_bit[Bit_air])
+	{
+		for (int i = 0; i < 7; i++)
+		{
+			airtime[i] = RecvBuf2[i + 31] & 0x7f;
+		}
+		airTime = TimetoString(airtime);
+	}	
+	else
+		airTime = ChartoString("无");
+
+	if (mState_bit[Bit_star])
+	{
+		for (int i = 0; i < 7; i++)
+		{
+			intime[i] = RecvBuf2[i + 38] & 0x7f;
+		}
+		inTime = TimetoString(intime);
 	}
-	openTime = TimetoString(opentime);
-	airTime = TimetoString(airtime);
-	inTime = TimetoString(intime);
-	endTime = TimetoString(endtime);
+	else
+		inTime = ChartoString("无");
+
+	if (mState_bit[Bit_end])
+	{
+		for (int i = 0; i < 7; i++)
+		{
+			endtime[i] = RecvBuf2[i + 45] & 0x7f;
+		}
+		endTime = TimetoString(endtime);
+	}
+	else
+		endTime = ChartoString("无");
+	
 
 	//信息处理
 	mVolume = RecvBuf2[52] << 8;
 	mVolume += RecvBuf2[53];
 
-	mState = RecvBuf2[56];
+	
 
 	mPower = RecvBuf2[59];
 
-	if (RecvBuf2[60] && 0x80)
-		mAir = RecvBuf2[60] & 0x7F;
-	else
-		mAir = 0;
+	mAir_flag = (RecvBuf2[60] && 0x80)?true:false;
+	mAir = RecvBuf2[60] & 0x7F;
 
 	mERR = RecvBuf2[61];
-	if (mERR)
+
+	if (mERR > 0)
 	{
-		mERRlog = (uint16_t*)malloc(mERR);
-		for (uint8_t i = 0; i < mERR; i++)
+		mERRlog = (uint16_t*)malloc(sizeof(uint16_t) * mERR);
+		for (uint8_t i = 0; i < mERR; i+=2)
 		{
 			mERRlog[i] = RecvBuf3[i+3] << 8;
 			mERRlog[i] += RecvBuf3[i+4];
@@ -1387,6 +1449,22 @@ int DFUCli::getInf(uint16_t index)
 	}
 
 	return 0;
+}
+
+int BIT(int n)
+{
+	return (1 << n);
+}
+
+bool DFUCli::get_state_bit(int bit)
+{
+	return mState_bit[bit] > 0 ?true:false;
+}
+
+bool DFUCli::get_ERRlog_bit(int logindex, int bit)
+{
+	return (mERRlog[logindex] & BIT(bit))? true : false;
+	//return false;
 }
 
 void DFUCli::dataInit()
@@ -1401,7 +1479,44 @@ void DFUCli::dataInit()
 	mState = 0;
 	mPower = 0;
 	mAir = 0;
+	if (mERR >0)
+		free(mERRlog);
 	mERR = 0;
-	free(mERRlog);
+	
+	free(mState_bit);
+}
+int DFUCli::Send_TDE(String^ cmd)
+{
+	int retval;
+	unsigned char rev[64];
+	std::string Cmd = marshal_as<std::string>(cmd);
+	char send[64];
+
+	strcpy(send, Cmd.c_str());
+
+	retval = hid_write(handle, (unsigned char*)send, Cmd.size());
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = hid_read(handle, rev, 64);
+	if (retval < 0) {
+		return -2;
+	}
+	else
+		TDERev = (char *)rev;
+
+	return 0;
+}
+
+String^ DFUCli::Send_TDE_GetTime()
+{
+	int retval;
+	unsigned char send[64] = "GetTime\r\n";
+	unsigned char rev[64];
+	retval = hid_write(handle, send, 10);
+	if (retval < 0) {
+		return "写入错误";
+	}
 }
 

@@ -35,11 +35,16 @@ public:
 	String^ inTime;
 	String^ endTime;
 	uint16_t mVolume;
-	uint8_t mState;
+
+	uint16_t mState;
+	uint16_t* mState_bit;
+
 	uint8_t mPower;
 	uint8_t mAir;
+	bool mAir_flag;
 	uint8_t mERR;
 	uint16_t* mERRlog;
+	char* TDERev;
 
 	DFUCli();
 	int Openhid();
@@ -98,7 +103,15 @@ public:
 
 	int getInf(uint16_t index);
 
+	bool get_state_bit(int bit);
+
+	bool get_ERRlog_bit(int logindex, int bit);
+
 	void dataInit();
+
+	int Send_TDE(String^ cmd);
+
+	String^ Send_TDE_GetTime();
 	
 	
 };
