@@ -833,6 +833,7 @@ int DFUCli::getHW(void)
 	uint8_t SendBuf[64] = { 0 };
 	uint8_t RecvBuf[64] = { 0 };
 	int retval = 0;
+	int len;
 	HW = (char*)malloc(8);
 
 	memset(SendBuf, 0x00, sizeof(SendBuf));
@@ -860,9 +861,7 @@ int DFUCli::getHW(void)
 		return -3;
 	}
 
-	if (RecvBuf[1] != 0x07) {
-		return -3;
-	}
+	len = RecvBuf[1];
 
 	if (RecvBuf[2] != 0x07) {
 		return -3;
@@ -872,17 +871,17 @@ int DFUCli::getHW(void)
 		return -3;
 	}
 	checksum = RecvBuf[1] + RecvBuf[2] + RecvBuf[3];
-	for (int i = 4; i < 9; i++)
+	for (int i = 4; i < len+2; i++)
 	{
 		HW[i - 4] = RecvBuf[i];
 		checksum += RecvBuf[i];
 	}
-	HW[5] = '\0';
-	if (RecvBuf[9] != checksum) {
+	HW[len-2] = '\0';
+	if (RecvBuf[len+2] != checksum) {
 		return -3;
 	}
 
-	if (RecvBuf[10] != 0x55) {
+	if (RecvBuf[len+3] != 0x55) {
 		return -3;
 	}
 
@@ -901,6 +900,7 @@ int DFUCli::getFW(void)
 	uint8_t SendBuf[64] = { 0 };
 	uint8_t RecvBuf[64] = { 0 };
 	int retval = 0;
+	int len;
 	FW = (char*)malloc(8);
 
 	memset(SendBuf, 0x00, sizeof(SendBuf));
@@ -928,9 +928,7 @@ int DFUCli::getFW(void)
 		return -3;
 	}
 
-	if (RecvBuf[1] != 0x08) {
-		return -3;
-	}
+	len = RecvBuf[1];
 
 	if (RecvBuf[2] != 0x07) {
 		return -3;
@@ -940,17 +938,17 @@ int DFUCli::getFW(void)
 		return -3;
 	}
 	checksum = RecvBuf[1] + RecvBuf[2] + RecvBuf[3];
-	for (int i = 4; i < 10; i++)
+	for (int i = 4; i < len+2; i++)
 	{
 		FW[i - 4] = RecvBuf[i];
 		checksum += RecvBuf[i];
 	}
-	FW[6] = '\0';
-	if (RecvBuf[10] != checksum) {
+	FW[len-2] = '\0';
+	if (RecvBuf[len+2] != checksum) {
 		return -3;
 	}
 
-	if (RecvBuf[11] != 0x55) {
+	if (RecvBuf[len+3] != 0x55) {
 		return -3;
 	}
 
@@ -1118,7 +1116,7 @@ int DFUCli::getAT(void)
 	uint8_t SendBuf[64] = { 0 };
 	uint8_t RecvBuf[64] = { 0 };
 	int retval = 0;
-	TIME = (uint8_t*)malloc(8);
+	TIME = (uint8_t*)malloc( sizeof(uint8_t) * 8);
 
 	memset(SendBuf, 0x00, sizeof(SendBuf));
 	memset(RecvBuf, 0x00, sizeof(RecvBuf));
@@ -1441,10 +1439,10 @@ int DFUCli::getInf(uint16_t index)
 	if (mERR > 0)
 	{
 		mERRlog = (uint16_t*)malloc(sizeof(uint16_t) * mERR);
-		for (uint8_t i = 0; i < mERR; i+=2)
+		for (int i = 0; i < mERR; i++)
 		{
-			mERRlog[i] = RecvBuf3[i+3] << 8;
-			mERRlog[i] += RecvBuf3[i+4];
+			mERRlog[i] = RecvBuf3[i*2+3] << 8;
+			mERRlog[i] += RecvBuf3[i*2+4];
 		}
 	}
 
@@ -1485,7 +1483,7 @@ void DFUCli::dataInit()
 	
 	free(mState_bit);
 }
-int DFUCli::Send_TDE(String^ cmd)
+String^ DFUCli::Send_TDE(String^ cmd)
 {
 	int retval;
 	unsigned char rev[64];
@@ -1496,27 +1494,44 @@ int DFUCli::Send_TDE(String^ cmd)
 
 	retval = hid_write(handle, (unsigned char*)send, Cmd.size());
 	if (retval < 0) {
-		return -1;
+		return "Ð´Èë´íÎó";
 	}
-
 	retval = hid_read(handle, rev, 64);
 	if (retval < 0) {
-		return -2;
+		return "¶ÁÈ¡´íÎó";
 	}
 	else
-		TDERev = (char *)rev;
-
-	return 0;
+	{
+		string str;
+		str = (char*)rev;
+		String^ stdToCli = marshal_as<String^>(str);
+		return stdToCli;
+	}
 }
 
 String^ DFUCli::Send_TDE_GetTime()
 {
 	int retval;
-	unsigned char send[64] = "GetTime\r\n";
+	unsigned char send[64] = " GetTime\r\n";
 	unsigned char rev[64];
 	retval = hid_write(handle, send, 10);
 	if (retval < 0) {
 		return "Ð´Èë´íÎó";
+	}
+	retval = hid_read(handle, rev, 64);
+	if (retval < 0) {
+		return "¶ÁÈ¡´íÎó";
+	}
+	else
+	{
+		string str;
+		char time[32];
+		
+		//str = (char*)rev;
+		sscanf((char*)rev, " CurrentTime=%s", time);
+		str = time;
+		String^ stdToCli = marshal_as<String^>(str);
+		return stdToCli;
 	}
 }
 

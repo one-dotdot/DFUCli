@@ -109,7 +109,7 @@ public:
 
 	void dataInit();
 
-	int Send_TDE(String^ cmd);
+	String^ Send_TDE(String^ cmd);
 
 	String^ Send_TDE_GetTime();
 	
