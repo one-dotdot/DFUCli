@@ -1535,3 +1535,58 @@ String^ DFUCli::Send_TDE_GetTime()
 	}
 }
 
+int DFUCli::clearLogs(void)
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 0x01;   // Len
+	SendBuf[3] = 0x09;   // Command Code - Clear all injection logs
+	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
+	SendBuf[5] = 0x55;   // Tail	
+
+	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+
+	if (RecvBuf[1] != 0x02) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x09) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x01) {
+		return -3;
+	}
+
+	checksum = RecvBuf[1] + RecvBuf[2] + RecvBuf[3];
+
+	if (RecvBuf[4] != checksum) {
+		return -3;
+	}
+
+	if (RecvBuf[5] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+}
+

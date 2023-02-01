@@ -130,9 +130,13 @@
   <ItemGroup>
     <ClInclude Include="DFUCli.h" />
     <ClInclude Include="hidapi.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DFUCli.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DFUCli.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

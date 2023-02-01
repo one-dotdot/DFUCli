@@ -112,6 +112,8 @@ public:
 	String^ Send_TDE(String^ cmd);
 
 	String^ Send_TDE_GetTime();
+
+	int clearLogs(void);
 	
 	
 };
