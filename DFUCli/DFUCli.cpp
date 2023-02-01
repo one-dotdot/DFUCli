@@ -834,7 +834,7 @@ int DFUCli::getHW(void)
 	uint8_t RecvBuf[64] = { 0 };
 	int retval = 0;
 	int len;
-	HW = (char*)malloc(8);
+	HW = (char*)malloc(12 * sizeof(char));
 
 	memset(SendBuf, 0x00, sizeof(SendBuf));
 	memset(RecvBuf, 0x00, sizeof(RecvBuf));
@@ -901,7 +901,7 @@ int DFUCli::getFW(void)
 	uint8_t RecvBuf[64] = { 0 };
 	int retval = 0;
 	int len;
-	FW = (char*)malloc(8);
+	FW = (char*)malloc(12 * sizeof(char));
 
 	memset(SendBuf, 0x00, sizeof(SendBuf));
 	memset(RecvBuf, 0x00, sizeof(RecvBuf));
@@ -1494,11 +1494,11 @@ String^ DFUCli::Send_TDE(String^ cmd)
 
 	retval = hid_write(handle, (unsigned char*)send, Cmd.size());
 	if (retval < 0) {
-		return "Ð´Èë´íÎó";
+		return  "Ð´Èë´íÎó";
 	}
 	retval = hid_read(handle, rev, 64);
 	if (retval < 0) {
-		return "¶ÁÈ¡´íÎó";
+		return  "¶ÁÈ¡´íÎó";
 	}
 	else
 	{
