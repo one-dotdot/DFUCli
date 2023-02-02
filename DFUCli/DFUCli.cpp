@@ -1285,6 +1285,10 @@ int DFUCli::getInf(uint16_t index)
 		return -2;
 	}
 
+	if (RecvBuf1[3] == 0xff) {
+		return -4;
+	}
+
 	if (RecvBuf1[0] != 0xAA) {
 		return -3;
 	}
@@ -1356,6 +1360,9 @@ int DFUCli::getInf(uint16_t index)
 	//数据处理
 	mIndex = RecvBuf1[3] << 8;
 	mIndex += RecvBuf1[4];
+
+	if (mIndex != index)
+		return -5;
 
 	mState = RecvBuf2[56] << 8;
 	mState += RecvBuf2[57];
@@ -1436,7 +1443,7 @@ int DFUCli::getInf(uint16_t index)
 
 	mERR = RecvBuf2[61];
 
-	if (mERR > 0)
+	if (mERR > 0 && mERR <= 30)
 	{
 		mERRlog = (uint16_t*)malloc(sizeof(uint16_t) * mERR);
 		for (int i = 0; i < mERR; i++)
@@ -1444,6 +1451,10 @@ int DFUCli::getInf(uint16_t index)
 			mERRlog[i] = RecvBuf3[i*2+3] << 8;
 			mERRlog[i] += RecvBuf3[i*2+4];
 		}
+	}
+	else
+	{
+		mERR = 0;
 	}
 
 	return 0;
@@ -1477,11 +1488,7 @@ void DFUCli::dataInit()
 	mState = 0;
 	mPower = 0;
 	mAir = 0;
-	if (mERR >0)
-		free(mERRlog);
 	mERR = 0;
-	
-	free(mState_bit);
 }
 String^ DFUCli::Send_TDE(String^ cmd)
 {
