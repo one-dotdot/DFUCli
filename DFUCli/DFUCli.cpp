@@ -1597,3 +1597,66 @@ int DFUCli::clearLogs(void)
 	return 0;
 }
 
+int DFUCli::clearStates(void)
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 0x02;   // Len
+	SendBuf[3] = 0x07;   // Command Code 
+	SendBuf[4] = 0x10;   // 0x0710 - Clear machine state to default setting
+	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
+	SendBuf[6] = 0x55;   // Tail		
+
+	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+	uint8_t len = RecvBuf[1];
+	if (len != 0x03) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x07) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x10) {
+		return -3;
+	}
+
+	if (RecvBuf[4] != 0x01) {
+		return -3;
+	}
+
+	for (size_t i = 0; i <= len; i++)
+	{
+		checksum += RecvBuf[1+i];
+	}
+
+	if (RecvBuf[len+2] != checksum) {
+		return -3;
+	}
+
+	if (RecvBuf[len+3] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+}
+

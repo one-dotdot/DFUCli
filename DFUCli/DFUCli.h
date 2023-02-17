@@ -114,6 +114,8 @@ public:
 	String^ Send_TDE_GetTime();
 
 	int clearLogs(void);
+
+	int clearStates(void);
 	
 	
 };

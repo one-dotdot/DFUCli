@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Intretech"
             VALUE "FileDescription", "DLL for syringe"
-            VALUE "FileVersion", "1.0.0.2"
+            VALUE "FileVersion", "1.0.0.3"
             VALUE "InternalName", "DFUCli.dll"
             VALUE "LegalCopyright", "Copyright (C) 2023"
             VALUE "OriginalFilename", "DFUCli.dll"
             VALUE "ProductName", "Syringe"
-            VALUE "ProductVersion", "1.0.0.2"
+            VALUE "ProductVersion", "1.0.0.3"
         END
     END
     BLOCK "VarFileInfo"
