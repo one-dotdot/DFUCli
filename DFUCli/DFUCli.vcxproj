@@ -128,11 +128,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Aes.h" />
     <ClInclude Include="DFUCli.h" />
     <ClInclude Include="hidapi.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Aes.cpp" />
     <ClCompile Include="DFUCli.cpp" />
   </ItemGroup>
   <ItemGroup>

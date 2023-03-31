@@ -330,12 +330,14 @@ int DFUCli::enter_into_dfu(void)
 	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
 	SendBuf[5] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -387,12 +389,14 @@ int DFUCli::check_bin_file(uint8_t* check, uint8_t len)
 	}
 	SendBuf[5 + len] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -440,12 +444,14 @@ int DFUCli::erase_flash_zone(void)
 	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
 	SendBuf[5] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -497,12 +503,14 @@ int DFUCli::write_app_data(uint8_t* pdata, uint8_t len)
 	}
 	SendBuf[5 + len] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -555,12 +563,14 @@ int DFUCli::write_app_data(int x, uint8_t len)
 	}
 	SendBuf[5 + len] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -608,12 +618,14 @@ int DFUCli::verify_app(void)
 	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
 	SendBuf[5] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -661,12 +673,14 @@ int DFUCli::exit_from_dfu(void)
 	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
 	SendBuf[5] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -716,12 +730,14 @@ int DFUCli::getSn(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -783,12 +799,14 @@ int DFUCli::getState(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -847,12 +865,14 @@ int DFUCli::getHW(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -914,12 +934,14 @@ int DFUCli::getFW(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -979,12 +1001,14 @@ int DFUCli::getBV(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1041,12 +1065,14 @@ int DFUCli::getLOG(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1129,12 +1155,14 @@ int DFUCli::getAT(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1266,21 +1294,22 @@ int DFUCli::getInf(uint16_t index)
 	SendBuf[6] = SendBuf[2] + SendBuf[3] + SendBuf[4] + SendBuf[5]; // Check Sum;
 	SendBuf[7] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
 	//校验
-	retval = hid_read(handle, RecvBuf1, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf1);
 	if (retval < 0) {
 		return -2;
 	}
-	retval = hid_read(handle, RecvBuf2, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf2);
 	if (retval < 0) {
 		return -2;
 	}
-	retval = hid_read(handle, RecvBuf3, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf3);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1542,6 +1571,84 @@ String^ DFUCli::Send_TDE_GetTime()
 	}
 }
 
+int DFUCli::SetTime()
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 0x09;   // Len
+	SendBuf[3] = 0x07;   
+	SendBuf[4] = 0x09;   // Command Code - Set System time
+
+	
+	SendBuf[5] = Int_ConvertTo_Hex(tm.tm_sec);
+	SendBuf[6] = Int_ConvertTo_Hex(tm.tm_min);
+	SendBuf[7] = Int_ConvertTo_Hex(tm.tm_hour);
+	SendBuf[8] = Int_ConvertTo_Hex(tm.tm_mday);
+	SendBuf[9] = 0x00;
+	SendBuf[10] = Int_ConvertTo_Hex(tm.tm_mon + 1);
+	SendBuf[11] = Int_ConvertTo_Hex(tm.tm_year - 70);
+	
+	for (int i = 2; i < 12; i++)
+	{
+		SendBuf[12] += SendBuf[i];
+	} // Check Sum;
+	SendBuf[13] = 0x55;   // Tail	
+
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+
+	if (RecvBuf[1] != 0x09) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x07) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x09) {
+		return -3;
+	}
+
+	for (int i = 1; i < 11; i++)
+	{
+		checksum += RecvBuf[i];
+	} // Check Sum;
+
+	if (RecvBuf[11] != checksum) {
+		return -3;
+	}
+
+	if (RecvBuf[12] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+
+}
+
 int DFUCli::clearLogs(void)
 {
 	uint8_t SendBuf[64] = { 0 };
@@ -1558,12 +1665,14 @@ int DFUCli::clearLogs(void)
 	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
 	SendBuf[5] = 0x55;   // Tail	
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1614,12 +1723,14 @@ int DFUCli::clearStates(void)
 	SendBuf[5] = SendBuf[2] + SendBuf[3] + SendBuf[4]; // Check Sum;
 	SendBuf[6] = 0x55;   // Tail		
 
-	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	retval = Hid_Aes_send64(handle, SendBuf);
+	//retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
 	if (retval < 0) {
 		return -1;
 	}
 
-	retval = hid_read(handle, RecvBuf, 64);
+	retval = Hid_Aes_rec64(handle, RecvBuf);
+	//retval = hid_read(handle, RecvBuf, 64);
 	if (retval < 0) {
 		return -2;
 	}
@@ -1660,3 +1771,83 @@ int DFUCli::clearStates(void)
 	return 0;
 }
 
+void DFUCli::AES_decrypt(uint8_t* ciphertext, uint8_t* plaintext)
+{
+	// 用于解密的密钥
+	uint8_t key[16] = { 0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3c };
+
+	// 初始化向量（IV）
+	uint8_t iv[16] = { 0 };
+
+	// 执行CBC解密
+	AES128_CBC_decrypt_buffer(plaintext, ciphertext, 64, key, iv);
+}
+
+void DFUCli::AES_encrypt(uint8_t* plaintext, uint8_t* ciphertext_hid)
+{
+	// 用于加密的密钥
+	uint8_t key[16] = { 0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3c };
+
+	// 初始化向量（IV）
+	uint8_t iv[16] = { 0 };
+
+	uint8_t ciphertext[64] = { 0 };
+	memset(ciphertext, 0x00, sizeof(ciphertext));
+	// 执行CBC加密
+	AES128_CBC_encrypt_buffer(ciphertext, plaintext, 64, key, iv);
+
+	memcpy(ciphertext_hid + 1, ciphertext, 64);
+
+	ciphertext_hid[0] = 0x00;
+}
+
+void DFUCli::shift_left(uint8_t* str)
+{
+	int len = 64;
+	for (int i = 1; i < len; i++)
+	{
+		str[i - 1] = str[i];
+	}
+	str[len - 1] = 0x00;
+}
+
+int DFUCli::Hid_Aes_send64(hid_device* dev, uint8_t* data)
+{
+	uint8_t Ciphertext[65] = { 0 };
+	int retval = 0;
+	memset(Ciphertext, 0x00, sizeof(Ciphertext));
+
+	shift_left(data);
+
+	AES_encrypt(data, Ciphertext);
+
+	retval = hid_write(dev, Ciphertext, 65);
+
+	return retval;
+}
+
+int DFUCli::Hid_Aes_rec64(hid_device* dev, uint8_t* data)
+{
+	uint8_t Ciphertext[64] = { 0 };
+	uint8_t Plaintext[64] = { 0 };
+	int retval = 0;
+
+	memset(Ciphertext, 0x00, sizeof(Ciphertext));
+	memset(Plaintext, 0x00, sizeof(Plaintext));
+
+	retval = hid_read(dev, Ciphertext, 64);
+
+	AES_decrypt(Ciphertext, Plaintext);
+
+	memcpy(data, Plaintext, 64);
+
+	return retval;
+}
+
+int DFUCli::Int_ConvertTo_Hex(int digt)
+{
+	char str[3];
+	sprintf(str, "%02d", digt);
+	int hex_value = strtol(str, NULL, 16);
+	return hex_value;
+}

@@ -4,6 +4,8 @@
 #include "string"
 #include "hidapi.h"
 #include <msclr\marshal_cppstd.h>
+#include <time.h>
+#include "Aes.h"
 
 using namespace msclr::interop;
 using namespace System;
@@ -113,10 +115,23 @@ public:
 
 	String^ Send_TDE_GetTime();
 
+	int SetTime();
+
 	int clearLogs(void);
 
 	int clearStates(void);
-	
-	
+
+	void AES_decrypt(uint8_t* ciphertext, uint8_t* plaintext);
+
+	void AES_encrypt(uint8_t* plaintext, uint8_t* ciphertext);
+
+	void shift_left(uint8_t* str);
+
+	int Hid_Aes_send64(hid_device* dev, uint8_t* data);
+
+	int Hid_Aes_rec64(hid_device* dev, uint8_t* data);
+
+	int Int_ConvertTo_Hex(int digt);
+
 };
 
