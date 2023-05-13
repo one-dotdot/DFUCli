@@ -6,6 +6,8 @@
 #include <msclr\marshal_cppstd.h>
 #include <iomanip>
 #include <sstream>
+#include <locale>
+#include <codecvt>
 
 using namespace msclr::interop;
 using namespace System;
@@ -20,6 +22,10 @@ public:
 	int Openhid();
 	void Closehid();
 	int Openhid(uint16_t Pid, uint16_t Vid);
+
+	String^ Getmanu();
+
+	String^ Getname();
 
 	String^ Send_TDE(String^ cmd);
 

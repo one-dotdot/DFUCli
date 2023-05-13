@@ -59,6 +59,28 @@ int DFUCli::Openhid(uint16_t Pid, uint16_t Vid)
 	return 0;
 }
 
+String^ DFUCli::Getmanu()
+{
+	wchar_t wstr[255];
+	hid_get_manufacturer_string(handle, wstr, 255);
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	std::wstring wide = wstr;
+	std::string narrow = converter.to_bytes(wide);
+	String^ stdToCli = marshal_as<String^>(narrow);
+	return stdToCli;
+}
+
+String^ DFUCli::Getname()
+{
+	wchar_t wstr[255];
+	hid_get_product_string(handle, wstr, 255);
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	std::wstring wide = wstr;
+	std::string narrow = converter.to_bytes(wide);
+	String^ stdToCli = marshal_as<String^>(narrow);
+	return stdToCli;
+}
+
 void ConvertToString(System::String^ str, std::string& text)
 {
 	char* p = (char*)(int)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str);
