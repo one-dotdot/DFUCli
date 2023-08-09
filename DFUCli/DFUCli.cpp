@@ -1916,7 +1916,7 @@ int DFUCli::write_flash_data(uint8_t* pdata, uint8_t len)
 		return -3;
 	}
 
-	if (RecvBuf[2] != 0x04) {
+	if (RecvBuf[2] != 0x0B) {
 		return -3;
 	}
 
