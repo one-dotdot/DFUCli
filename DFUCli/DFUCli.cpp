@@ -1542,6 +1542,84 @@ String^ DFUCli::Send_TDE_GetTime()
 	}
 }
 
+int DFUCli::SetTime()
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 0x09;   // Len
+	SendBuf[3] = 0x07;
+	SendBuf[4] = 0x09;   // Command Code - Set System time
+
+
+	SendBuf[5] = Int_ConvertTo_Hex(tm.tm_sec);
+	SendBuf[6] = Int_ConvertTo_Hex(tm.tm_min);
+	SendBuf[7] = Int_ConvertTo_Hex(tm.tm_hour);
+	SendBuf[8] = Int_ConvertTo_Hex(tm.tm_mday);
+	SendBuf[9] = 0x00;
+	SendBuf[10] = Int_ConvertTo_Hex(tm.tm_mon + 1);
+	SendBuf[11] = Int_ConvertTo_Hex(tm.tm_year - 70);
+
+	for (int i = 2; i < 12; i++)
+	{
+		SendBuf[12] += SendBuf[i];
+	} // Check Sum;
+	SendBuf[13] = 0x55;   // Tail	
+
+	//retval = Hid_Aes_send64(handle, SendBuf);
+	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	//retval = Hid_Aes_rec64(handle, RecvBuf);
+	retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+
+	if (RecvBuf[1] != 0x09) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x07) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x09) {
+		return -3;
+	}
+
+	for (int i = 1; i < 11; i++)
+	{
+		checksum += RecvBuf[i];
+	} // Check Sum;
+
+	if (RecvBuf[11] != checksum) {
+		return -3;
+	}
+
+	if (RecvBuf[12] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+
+}
+
 int DFUCli::clearLogs(void)
 {
 	uint8_t SendBuf[64] = { 0 };
@@ -1654,6 +1732,203 @@ int DFUCli::clearStates(void)
 	}
 
 	if (RecvBuf[len+3] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+}
+
+int DFUCli::clearFlash(void)
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 0x01;   // Len
+	SendBuf[3] = 0x0A;   // Command Code  clear extern flash
+	SendBuf[4] = SendBuf[2] + SendBuf[3]; // Check Sum;
+	SendBuf[5] = 0x55;   // Tail		
+
+	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+	uint8_t len = RecvBuf[1];
+	if (len != 0x02) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x0A) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x01) {
+		return -3;
+	}
+
+	for (size_t i = 0; i <= len; i++)
+	{
+		checksum += RecvBuf[1 + i];
+	}
+
+	if (RecvBuf[len + 2] != checksum) {
+		return -3;
+	}
+
+	if (RecvBuf[len + 3] != 0x55) {
+		return -3;
+	}
+
+	return 0;
+}
+
+int DFUCli::Int_ConvertTo_Hex(int digt)
+{
+	char str[3];
+	sprintf(str, "%02d", digt);
+	int hex_value = strtol(str, NULL, 16);
+	return hex_value;
+}
+
+int DFUCli::WriteFlash(String^ filepath)
+{
+	FILE* fp;
+	errno_t err;
+	int retval = 0;
+	int i = 0;
+
+	std::string FilePath = marshal_as<std::string>(filepath);
+
+	err = fopen_s(&fp, FilePath.c_str(), "rb");
+	if (err) {
+		return ERRO_FP;
+	}
+
+	// Step 1: Get File Length
+	fseek(fp, 0, SEEK_END);
+	FileLen = ftell(fp);
+
+	// Step 2: Read total file data
+	fseek(fp, 0, SEEK_SET);
+	FileData = (uint8_t*)malloc(FileLen);
+	if (!FileData) {
+		fclose(fp);
+		return ERRO_MM;
+	}
+
+	retval = fread(FileData, 1, FileLen, fp);
+	if (retval != FileLen) {
+		fclose(fp);
+		free(FileData);
+		return ERRO_FR;
+	}
+	fclose(fp);
+
+	// Step 3: Erase Flash Zone
+	retval = clearFlash();
+	if (retval) {
+		goto ERRO_OUT;
+	}
+
+	// Step 4: Write Data	
+	LoopNum = FileLen / 2048;
+	Remain = FileLen % 2048;
+
+ERRO_OUT:
+	switch (retval) {
+	case 0:
+		return OK;
+		break;
+	case -1:
+	case -2:
+		return ERRO_DR;
+		break;
+	case -3:
+		return ERRO_XY;
+		break;
+	case -4:
+		return ERRO_FW;
+		break;
+	case -5:
+		return ERRO_FV;
+		break;
+	default:
+		break;
+	}
+	return 0;
+
+}
+
+int DFUCli::writeFlashDate(int step, int size)
+{
+	return write_flash_data(FileData + step, size);
+}
+
+int DFUCli::write_flash_data(uint8_t* pdata, uint8_t len)
+{
+	uint8_t SendBuf[64] = { 0 };
+	uint8_t RecvBuf[64] = { 0 };
+	int retval = 0;
+	int i = 0;
+
+	memset(SendBuf, 0x00, sizeof(SendBuf));
+	memset(RecvBuf, 0x00, sizeof(RecvBuf));
+
+	SendBuf[0] = 0x00;   // Report ID;
+	SendBuf[1] = 0xAA;   // Head
+	SendBuf[2] = 1 + len;  // Len
+	SendBuf[3] = 0x0B;   // Command Code 0x0B - Write Flash Data
+	memcpy(SendBuf + 4, pdata, len);
+	for (i = 0; i < 2 + len; i++) {
+		SendBuf[4 + len] += SendBuf[2 + i];
+	}
+	SendBuf[5 + len] = 0x55;   // Tail	
+
+	retval = hid_write(handle, SendBuf, 64);   // Report Size is 64 bytes
+	if (retval < 0) {
+		return -1;
+	}
+
+	retval = hid_read(handle, RecvBuf, 64);
+	if (retval < 0) {
+		return -2;
+	}
+
+	if (RecvBuf[0] != 0xAA) {
+		return -3;
+	}
+
+	if (RecvBuf[1] != 0x02) {
+		return -3;
+	}
+
+	if (RecvBuf[2] != 0x04) {
+		return -3;
+	}
+
+	if (RecvBuf[3] != 0x01) {
+		return -3;
+	}
+
+	if (RecvBuf[4] != (RecvBuf[1] + RecvBuf[2] + RecvBuf[3])) {
+		return -3;
+	}
+
+	if (RecvBuf[5] != 0x55) {
 		return -3;
 	}
 

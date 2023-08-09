@@ -112,11 +112,18 @@ public:
 	String^ Send_TDE(String^ cmd);
 
 	String^ Send_TDE_GetTime();
+	int SetTime();
 
 	int clearLogs(void);
 
 	int clearStates(void);
+	int clearFlash(void);
 	
+	int Int_ConvertTo_Hex(int digt);
+
+	int WriteFlash(String^ filepath);
 	
+	int writeFlashDate(int step, int size);
+	int write_flash_data(uint8_t* pdata, uint8_t len);
 };
 
