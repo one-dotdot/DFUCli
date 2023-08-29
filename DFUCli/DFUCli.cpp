@@ -1499,11 +1499,18 @@ String^ DFUCli::Send_TDE(String^ cmd)
 
 	strcpy(send, Cmd.c_str());
 
+	hid_set_nonblocking(handle, 1);   // NoBlocking Mode
+
 	retval = hid_write(handle, (unsigned char*)send, Cmd.size());
 	if (retval < 0) {
 		return  "Ð´Èë´íÎó";
 	}
+	Sleep(10);
 	retval = hid_read(handle, rev, 64);
+	if (retval == 0) {
+		return  "¿ÕÊý¾Ý";
+	}
+	hid_set_nonblocking(handle, 0);   // Blocking Mode
 	if (retval < 0) {
 		return  "¶ÁÈ¡´íÎó";
 	}
